@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vehdic Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Sora',sans-serif;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0d0b08;--s1:#171310;--s2:#1f1a15;--s3:#27211a;
+  --br:rgba(184,92,26,.2);--br2:rgba(184,92,26,.09);
+  --pr:#e8821a;--pr2:#b85c1a;--pg:rgba(232,130,26,.12);
+  --tx:#f0e8dc;--tx2:#9a8878;--tx3:#5c4c3c;
+  --green:#4a7c59;--red:#c0392b;
+  --r:14px;--r2:10px;
+  --sb:220px; /* sidebar width */
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);overflow-x:hidden;}
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px;}
+
+/* ══════════════════════════════
+   AUTH SCREEN
+══════════════════════════════ */
+#authScreen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 40% 50%, #1f1208 0%, var(--bg) 70%);
+  z-index:999;padding:20px;
+}
+.auth-card{
+  background:var(--s1);border:1px solid var(--br);border-radius:24px;
+  padding:36px 28px;width:100%;max-width:360px;
+  box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px rgba(232,130,26,.05);
+}
+.auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.auth-brand-icon{
+  width:46px;height:46px;border-radius:14px;
+  background:linear-gradient(135deg,#e8821a,#b85c1a);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;color:#fff;
+}
+.auth-brand-name{font-size:20px;font-weight:900;background:linear-gradient(135deg,#e8821a,#b85c1a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-brand-sub{font-size:11px;color:var(--tx3);margin-top:2px;font-weight:600;}
+.f{margin-bottom:14px;}
+.f label{display:block;font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.fi{width:100%;padding:13px 14px;background:var(--s2);border:1.5px solid var(--br2);border-radius:var(--r2);font-size:14px;font-family:inherit;color:var(--tx);outline:none;transition:border-color .2s;}
+.fi:focus{border-color:var(--pr);}
+.auth-err{font-size:12px;color:#e87060;min-height:16px;margin-bottom:8px;}
+.auth-btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#e8821a,#b85c1a);
+  color:#fff;border:none;border-radius:var(--r2);
+  font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:opacity .2s,transform .1s;
+}
+.auth-btn:active{opacity:.85;transform:scale(.98);}
+.auth-btn:disabled{opacity:.5;}
+
+/* ══════════════════════════════
+   APP LAYOUT
+══════════════════════════════ */
+#app{display:none;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sb{
+  width:var(--sb);background:var(--s1);border-right:1px solid var(--br2);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;z-index:200;
+  transition:transform .3s cubic-bezier(.32,.72,0,1);
+}
+.sb-top{
+  padding:20px 16px;border-bottom:1px solid var(--br2);
+  display:flex;align-items:center;gap:10px;
+}
+.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#e8821a,#b85c1a);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0;}
+.sb-name{font-size:15px;font-weight:900;background:linear-gradient(135deg,#e8821a,#b85c1a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-sub{font-size:10px;color:var(--tx3);font-weight:600;}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto;}
+.sb-sec{margin-bottom:20px;}
+.sb-sec-lbl{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.6px;padding:0 8px;margin-bottom:6px;}
+.si{
+  display:flex;align-items:center;gap:9px;padding:10px 10px;
+  border-radius:var(--r2);cursor:pointer;color:var(--tx2);
+  font-size:13px;font-weight:600;transition:all .15s;
+  border:none;background:none;width:100%;text-align:left;
+}
+.si svg{flex-shrink:0;opacity:.7;transition:opacity .15s;}
+.si:hover{background:var(--s2);color:var(--tx);}
+.si:hover svg{opacity:1;}
+.si.on{background:var(--pg);color:var(--pr);border:1px solid rgba(232,130,26,.2);}
+.si.on svg{opacity:1;}
+.si-badge{
+  margin-left:auto;background:var(--pr);color:#fff;
+  font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;
+  animation:pulse2 2s ease-in-out infinite;
+}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.7}}
+.sb-footer{padding:14px;border-top:1px solid var(--br2);}
+.sb-user{display:flex;align-items:center;gap:9px;}
+.sb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e8821a,#b85c1a);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.sb-email{font-size:11px;color:var(--tx2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sb-out{background:none;border:none;color:var(--tx3);cursor:pointer;padding:6px;border-radius:6px;transition:color .15s;}
+.sb-out:hover{color:#e87060;}
+
+/* ── MOBILE HEADER ── */
+.mob-hd{
+  display:none;position:fixed;top:0;left:0;right:0;
+  background:rgba(13,11,8,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--br2);
+  padding:12px 16px;
+  align-items:center;justify-content:space-between;z-index:150;
+  height:56px;
+}
+.mob-hd-left{display:flex;align-items:center;gap:10px;}
+.mob-hd-logo{font-size:16px;font-weight:900;background:linear-gradient(135deg,#e8821a,#b85c1a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ham{
+  background:var(--s2);border:1px solid var(--br2);border-radius:8px;
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--tx);transition:background .15s;
+}
+.ham:active{background:var(--s3);}
+
+/* ── OVERLAY ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:190;}
+.ov.on{display:block;}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sb);padding:28px;min-height:100vh;}
+.pg{display:none;}
+.pg.on{display:block;animation:pgIn .2s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.pg-hd{margin-bottom:24px;}
+.pg-hd h1{font-size:22px;font-weight:900;}
+.pg-hd p{font-size:13px;color:var(--tx2);margin-top:3px;}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat{background:var(--s1);border:1px solid var(--br2);border-radius:var(--r);padding:16px;}
+.stat-lbl{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;}
+.stat-val{font-size:24px;font-weight:900;}
+.stat-sub{font-size:11px;color:var(--tx2);margin-top:3px;}
+
+/* ── CARD ── */
+.card{background:var(--s1);border:1px solid var(--br2);border-radius:var(--r);overflow:hidden;margin-bottom:18px;}
+.card-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--br2);flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:800;}
+.card-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:500px;}
+th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--br2);white-space:nowrap;}
+td{padding:12px 14px;font-size:13px;color:var(--tx2);border-bottom:1px solid var(--br2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.015);}
+td b{color:var(--tx);font-weight:700;}
+
+/* ── STATUS BADGES ── */
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
+.b-pending{background:rgba(212,148,10,.15);color:#e8b040;}
+.b-processing{background:rgba(19,118,244,.15);color:#60a8f8;}
+.b-shipped{background:rgba(74,124,89,.15);color:#6db88a;}
+.b-delivered{background:rgba(74,124,89,.2);color:#4ddd88;}
+.b-cancelled{background:rgba(192,57,43,.15);color:#e87060;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--r2);font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:opacity .15s,transform .1s;white-space:nowrap;}
+.btn:active{transform:scale(.95);}
+.bp{background:linear-gradient(135deg,#e8821a,#b85c1a);color:#fff;}
+.bs{background:var(--s2);color:var(--tx);border:1px solid var(--br2);}
+.bd{background:rgba(192,57,43,.12);color:#e87060;border:1px solid rgba(192,57,43,.2);}
+.btn-lg{padding:13px 20px;font-size:14px;border-radius:var(--r);}
+
+/* ── FORM ── */
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:11px 13px;background:var(--s2);
+  border:1.5px solid var(--br2);border-radius:var(--r2);
+  font-size:13px;font-family:inherit;color:var(--tx);outline:none;transition:border-color .2s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--pr);}
+.fg select option{background:var(--s1);}
+.fg textarea{resize:vertical;min-height:72px;}
+.fg-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.fg-full{grid-column:1/-1;}
+
+/* ── MODAL ── */
+.mo{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
+  z-index:500;display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;
+  padding:0;
+}
+.mo.on{opacity:1;visibility:visible;}
+/* On desktop center it, on mobile slide up from bottom */
+.mo-box{
+  background:var(--s1);border:1px solid var(--br);
+  width:100%;max-width:600px;
+  border-radius:20px 20px 0 0;
+  padding:0;
+  transform:translateY(40px);
+  transition:transform .3s cubic-bezier(.32,.72,0,1);
+  max-height:90vh;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:0 -20px 60px rgba(0,0,0,.5);
+}
+.mo.on .mo-box{transform:translateY(0);}
+.mo-handle{width:36px;height:4px;background:var(--s3);border-radius:2px;margin:12px auto 0;}
+.mo-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--br2);flex-shrink:0;}
+.mo-title{font-size:16px;font-weight:800;}
+.mo-close{background:var(--s2);border:none;color:var(--tx2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.mo-body{padding:20px;overflow-y:auto;flex:1;}
+
+/* ── LIVE ── */
+.live{display:inline-flex;align-items:center;gap:5px;background:rgba(74,124,89,.12);color:#6db88a;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid rgba(74,124,89,.2);}
+.dot{width:7px;height:7px;background:#4ddd88;border-radius:50%;animation:dotPulse 1.5s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--s2);border:1px solid var(--br);border-radius:12px;
+  padding:12px 20px;font-size:13px;font-weight:600;z-index:9999;
+  opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.ok{border-color:rgba(74,124,89,.4);color:#6db88a;}
+#toast.err{border-color:rgba(192,57,43,.4);color:#e87060;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:50px 20px;}
+.empty svg{opacity:.25;margin-bottom:12px;}
+.empty h3{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:5px;}
+.empty p{font-size:13px;color:var(--tx2);}
+
+/* ── PREVIEW BOXES ── */
+.hero-prev{
+  background:linear-gradient(135deg,#f5ede0,#efe3d0);
+  border-radius:10px;padding:18px;display:flex;align-items:center;gap:14px;
+  margin-bottom:14px;min-height:80px;
+}
+.hero-prev img{height:60px;object-fit:contain;border-radius:8px;flex-shrink:0;}
+.prev-ey{font-size:10px;color:#e8821a;font-weight:700;}
+.prev-sub{font-size:11px;color:#7c6f5e;font-weight:700;}
+.prev-tit{font-size:20px;font-weight:900;color:#1a1208;}
+.banner-prev{border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;min-height:60px;gap:10px;}
+.bp-r{background:linear-gradient(135deg,#7a3510,#5c1420);}
+.bp-g{background:linear-gradient(135deg,#2d5a3c,#1d3c28);}
+.banner-prev h3{font-size:14px;font-weight:900;color:#fff;}
+.banner-prev p{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
+.banner-prev img{height:44px;object-fit:contain;border-radius:6px;flex-shrink:0;}
+
+/* ── ORDER DETAIL ── */
+.o-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--s2);border-radius:10px;padding:14px;margin-bottom:14px;}
+.o-cell label{font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;display:block;margin-bottom:2px;}
+.o-cell span{font-size:13px;color:var(--tx);font-weight:600;}
+.o-items-box{background:var(--s2);border-radius:10px;padding:14px;margin-bottom:14px;}
+.o-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--br2);font-size:13px;}
+.o-row:last-child{border:none;}
+.o-total{display:flex;justify-content:space-between;font-size:15px;font-weight:800;padding-top:12px;border-top:1px solid var(--br);}
+.status-sel{padding:9px 13px;background:var(--s2);border:1.5px solid var(--br);border-radius:var(--r2);color:var(--tx);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;outline:none;flex:1;}
+.status-sel:focus{border-color:var(--pr);}
+
+/* ── PRODUCT THUMB ── */
+.p-thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;background:var(--s2);flex-shrink:0;}
+
+/* ── SECTION SEP ── */
+.sec-sep{font-size:12px;font-weight:700;color:var(--tx3);margin:18px 0 10px;text-transform:uppercase;letter-spacing:.5px;}
+
+/* ══════════════════════════════
+   RESPONSIVE
+══════════════════════════════ */
+@media(max-width:900px){
+  .sb{transform:translateX(calc(-1 * var(--sb)));}
+  .sb.open{transform:translateX(0);}
+  .mob-hd{display:flex;}
+  .main{margin-left:0;padding:16px;padding-top:70px;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .fg-2{grid-template-columns:1fr;}
+  /* Modal full bottom sheet on mobile */
+  .mo{align-items:flex-end;}
+  .mo-box{max-width:100%;border-radius:20px 20px 0 0;max-height:85vh;}
+}
+@media(max-width:500px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .stat-val{font-size:20px;}
+  .card-hd{flex-direction:column;align-items:flex-start;}
+  .pg-hd h1{font-size:19px;}
+  table{min-width:400px;}
+}
+@media(min-width:901px){
+  .mo{align-items:center;}
+  .mo-box{border-radius:20px;max-height:88vh;}
+  .mo-handle{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-brand-icon">V</div>
+      <div>
+        <div class="auth-brand-name">Vehdic Admin</div>
+        <div class="auth-brand-sub">Secure Control Panel</div>
+      </div>
+    </div>
+    <div class="f"><label>Email</label><input class="fi" type="email" id="aEmail" placeholder="admin@vehdic.com" autocomplete="email"></div>
+    <div class="f"><label>Password</label><input class="fi" type="password" id="aPass" placeholder="Password" autocomplete="current-password"></div>
+    <div class="auth-err" id="aErr"></div>
+    <button class="auth-btn" id="aBtn">Sign In to Admin</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- Mobile Header -->
+  <header class="mob-hd">
+    <div class="mob-hd-left">
+      <button class="ham" id="hamBtn">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <span class="mob-hd-logo">Vehdic Admin</span>
+    </div>
+    <span class="live" style="font-size:10px;"><span class="dot"></span>Live</span>
+  </header>
+  <div class="ov" id="ov"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sb" id="sb">
+    <div class="sb-top">
+      <div class="sb-logo-icon">V</div>
+      <div><div class="sb-name">Vehdic</div><div class="sb-sub">Admin Panel</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">
+        <div class="sb-sec-lbl">Overview</div>
+        <button class="si on" data-pg="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          Dashboard
+        </button>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-sec-lbl">Store</div>
+        <button class="si" data-pg="orders">
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Orders
+          <span class="si-badge" id="pendBadge" style="display:none"></span>
+        </button>
+        <button class="si" data-pg="products">
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z" stroke="currentColor" stroke-width="1.8"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Products
+        </button>
+        <button class="si" data-pg="homepage">
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Homepage
+        </button>
+        <button class="si" data-pg="coupons">
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v10M7 12h.01M17 12h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Coupons
+        </button>
+      </div>
+      <div class="sb-sec">
+        <div class="sb-sec-lbl">People</div>
+        <button class="si" data-pg="customers">
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Customers
+        </button>
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-av" id="sbAv">V</div>
+        <div class="sb-email" id="sbEmail">admin</div>
+        <button class="sb-out" id="soBtn" title="Sign out">
+          <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="pg on" id="pg-dashboard">
+      <div class="pg-hd"><h1>Dashboard</h1><p>Live store overview</p></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-lbl">Orders</div><div class="stat-val" id="s-ord">—</div><div class="stat-sub">All time</div></div>
+        <div class="stat"><div class="stat-lbl">Revenue</div><div class="stat-val" id="s-rev">—</div><div class="stat-sub">Excl. cancelled</div></div>
+        <div class="stat"><div class="stat-lbl">Pending</div><div class="stat-val" id="s-pend">—</div><div class="stat-sub">Need action</div></div>
+        <div class="stat"><div class="stat-lbl">Customers</div><div class="stat-val" id="s-cust">—</div><div class="stat-sub">Registered</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Recent Orders</span><span class="live"><span class="dot"></span>Live</span></div>
+        <div class="tw" id="dash-wrap"><div class="empty"><p>Loading…</p></div></div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="pg" id="pg-orders">
+      <div class="pg-hd"><h1>Orders</h1><p>Updates in real time — no refresh needed</p></div>
+      <div class="card">
+        <div class="card-hd">
+          <span class="card-title">All Orders <span class="live" style="font-size:10px;margin-left:6px;"><span class="dot"></span>Live</span></span>
+          <select id="sf" class="bs btn" style="cursor:pointer;">
+            <option value="">All Status</option>
+            <option>Pending</option><option>Processing</option>
+            <option>Shipped</option><option>Delivered</option><option>Cancelled</option>
+          </select>
+        </div>
+        <div class="tw" id="ord-wrap"><div class="empty"><p>Loading…</p></div></div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="pg" id="pg-products">
+      <div class="pg-hd"><h1>Products</h1><p>Manage your catalog</p></div>
+      <div class="card">
+        <div class="card-hd">
+          <span class="card-title">All Products</span>
+          <button class="btn bp" id="addPBtn">
+            <svg viewBox="0 0 24 24" fill="none" width="13" height="13"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            Add Product
+          </button>
+        </div>
+        <div class="tw" id="prod-wrap"><div class="empty"><p>Loading…</p></div></div>
+      </div>
+    </div>
+
+    <!-- HOMEPAGE -->
+    <div class="pg" id="pg-homepage">
+      <div class="pg-hd"><h1>Homepage Editor</h1><p>Changes apply on site reload</p></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hd"><span class="card-title">Hero Section</span><button class="btn bp" id="saveHero">Save</button></div>
+        <div style="padding:16px;">
+          <div class="hero-prev" id="hPrev"><div><div class="prev-ey" id="pEy"></div><div class="prev-sub" id="pSub"></div><div class="prev-tit" id="pTit"></div></div><img id="pImg" src="" style="display:none" alt=""></div>
+          <div class="fg-2">
+            <div class="fg"><label>Eyebrow</label><input type="text" id="h-ey" placeholder="⭐ Super Special"></div>
+            <div class="fg"><label>Subtitle (small)</label><input type="text" id="h-sub" placeholder="Gir Ahinsak"></div>
+            <div class="fg"><label>Main Title</label><input type="text" id="h-tit" placeholder="Nasya"></div>
+            <div class="fg"><label>Watermark Text</label><input type="text" id="h-bg" placeholder="NASYA"></div>
+            <div class="fg fg-full"><label>Description</label><input type="text" id="h-desc" placeholder="Ancient Ayurvedic…"></div>
+            <div class="fg fg-full"><label>Product Image URL</label><input type="text" id="h-img" placeholder="https://…"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hd"><span class="card-title">Sale Banners</span><button class="btn bp" id="saveBan">Save</button></div>
+        <div style="padding:16px;">
+          <div class="sec-sep">Banner 1 — Terracotta/Red</div>
+          <div class="banner-prev bp-r"><div><h3 id="bp1T">—</h3><p id="bp1D">—</p></div><img id="bp1I" src="" style="display:none" alt=""></div>
+          <div class="fg-2" style="margin-bottom:18px;">
+            <div class="fg"><label>Left Title</label><input type="text" id="b1-lt" placeholder="PURE NASYA"></div>
+            <div class="fg"><label>Discount</label><input type="text" id="b1-dis" placeholder="50% off"></div>
+            <div class="fg"><label>Right Heading</label><input type="text" id="b1-rt" placeholder="Summer Sale"></div>
+            <div class="fg"><label>Description</label><input type="text" id="b1-d" placeholder="Short line…"></div>
+            <div class="fg fg-full"><label>Image URL</label><input type="text" id="b1-img" placeholder="https://…"></div>
+          </div>
+          <div class="sec-sep">Banner 2 — Forest Green</div>
+          <div class="banner-prev bp-g"><div><h3 id="bp2T">—</h3><p id="bp2D">—</p></div><img id="bp2I" src="" style="display:none" alt=""></div>
+          <div class="fg-2">
+            <div class="fg"><label>Left Title</label><input type="text" id="b2-lt" placeholder="SACRED PUJA"></div>
+            <div class="fg"><label>Discount</label><input type="text" id="b2-dis" placeholder="50% off"></div>
+            <div class="fg"><label>Right Heading</label><input type="text" id="b2-rt" placeholder="Summer Sale"></div>
+            <div class="fg"><label>Description</label><input type="text" id="b2-d" placeholder="Short line…"></div>
+            <div class="fg fg-full"><label>Image URL</label><input type="text" id="b2-img" placeholder="https://…"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Products Section Labels</span><button class="btn bp" id="saveSec">Save</button></div>
+        <div style="padding:16px;">
+          <div class="fg-2">
+            <div class="fg"><label>Title</label><input type="text" id="sec-t" placeholder="Our Products"></div>
+            <div class="fg"><label>Subtitle</label><input type="text" id="sec-s" placeholder="Pure · Natural · Ayurvedic"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUPONS -->
+    <div class="pg" id="pg-coupons">
+      <div class="pg-hd"><h1>Coupons</h1><p>Manage discount codes</p></div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Active Coupons</span><button class="btn bp" id="addCBtn">+ Add Coupon</button></div>
+        <div class="tw" id="coup-wrap"><div class="empty"><p>Loading…</p></div></div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="pg" id="pg-customers">
+      <div class="pg-hd"><h1>Customers</h1><p>All registered users</p></div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Customer List</span></div>
+        <div class="tw" id="cust-wrap"><div class="empty"><p>Loading…</p></div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="mo" id="oMo">
+  <div class="mo-box">
+    <div class="mo-handle"></div>
+    <div class="mo-hd"><span class="mo-title" id="oTitle">Order</span><button class="mo-close" id="oClose">✕</button></div>
+    <div class="mo-body" id="oBody"></div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="mo" id="pMo">
+  <div class="mo-box">
+    <div class="mo-handle"></div>
+    <div class="mo-hd"><span class="mo-title" id="pTitle">Product</span><button class="mo-close" id="pClose">✕</button></div>
+    <div class="mo-body">
+      <div class="fg-2">
+        <div class="fg"><label>Name *</label><input type="text" id="pm-name" placeholder="Product name"></div>
+        <div class="fg"><label>Category *</label>
+          <select id="pm-cat"><option value="Health">Health</option><option value="Puja">Puja</option><option value="Edible">Edible</option></select>
+        </div>
+        <div class="fg"><label>Price ₹ *</label><input type="number" id="pm-price" placeholder="610"></div>
+        <div class="fg"><label>Original Price ₹</label><input type="number" id="pm-orig" placeholder="680"></div>
+        <div class="fg"><label>Rating (0–5)</label><input type="number" id="pm-rat" placeholder="4.9" step="0.1"></div>
+        <div class="fg"><label>Reviews Count</label><input type="number" id="pm-rev" placeholder="312"></div>
+        <div class="fg fg-full"><label>Main Image URL *</label><input type="text" id="pm-img" placeholder="https://…"></div>
+        <div class="fg fg-full"><label>Extra Images (one URL per line)</label><textarea id="pm-imgs" rows="3" placeholder="https://img1.jpg&#10;https://img2.jpg"></textarea></div>
+        <div class="fg fg-full"><label>Description</label><textarea id="pm-desc" rows="3" placeholder="Product description…"></textarea></div>
+        <div class="fg fg-full"><label>Highlights (one per line)</label><textarea id="pm-hl" rows="4" placeholder="Pure A2 Gir Cow Ghee&#10;No preservatives"></textarea></div>
+        <div class="fg fg-full">
+          <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-size:13px;cursor:pointer;font-weight:600;">
+            <input type="checkbox" id="pm-sp" style="width:16px;height:16px;accent-color:var(--pr);">
+            Mark as ⭐ Super Special
+          </label>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button class="btn bp btn-lg" id="pmSave" style="flex:1">Save Product</button>
+        <button class="btn bd btn-lg" id="pmDel" style="display:none">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COUPON MODAL -->
+<div class="mo" id="cMo">
+  <div class="mo-box" style="max-width:460px;">
+    <div class="mo-handle"></div>
+    <div class="mo-hd"><span class="mo-title" id="cTitle">Coupon</span><button class="mo-close" id="cClose">✕</button></div>
+    <div class="mo-body">
+      <div class="fg"><label>Code *</label><input type="text" id="cm-code" placeholder="VEHDIC10" style="text-transform:uppercase;letter-spacing:.5px;font-weight:700;"></div>
+      <div class="fg"><label>Type *</label>
+        <select id="cm-type"><option value="percent">Percentage (%)</option><option value="fixed">Fixed Amount (₹)</option><option value="ship">Free Shipping</option></select>
+      </div>
+      <div class="fg" id="cm-vg"><label>Value</label><input type="number" id="cm-val" placeholder="10"></div>
+      <div class="fg"><label>Label shown to user</label><input type="text" id="cm-lbl" placeholder="10% off"></div>
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button class="btn bp btn-lg" id="cmSave" style="flex:1">Save Coupon</button>
+        <button class="btn bd btn-lg" id="cmDel" style="display:none">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getDatabase, ref, get, set, push, update, remove, onValue }
+       from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+       from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+const cfg = {
+    apiKey:"AIzaSyCr4X0JCSg3GOLTbltdWihl5a4GZs6ipq8",
+    authDomain:"vehdic.firebaseapp.com",
+    projectId:"vehdic",
+    databaseURL:"https://vehdic-default-rtdb.asia-southeast1.firebasedatabase.app",
+    storageBucket:"vehdic.firebasestorage.app",
+    messagingSenderId:"544387227261",
+    appId:"1:544387227261:web:0ab1783048eb866ce55b14"
+};
+const fbApp = initializeApp(cfg);
+const db    = getDatabase(fbApp);
+const auth  = getAuth(fbApp);
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let orders=[], products=[], customers=[], coupons={};
+let editPId=null, editCCode=null;
+let _unsubOrders=null;
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const v  = id => $(id)?.value||'';
+const inr = n => '₹'+Math.round(n).toLocaleString('en-IN');
+const sc = s => ({'Pending':'b-pending','Processing':'b-processing','Shipped':'b-shipped','Delivered':'b-delivered','Cancelled':'b-cancelled'}[s]||'b-pending');
+
+function toast(msg,type=''){
+    const t=$('toast'); t.textContent=msg; t.className='on '+type;
+    clearTimeout(t._t); t._t=setTimeout(()=>t.className='',3000);
+}
+function openMo(id){$(id).classList.add('on');document.body.style.overflow='hidden';}
+function closeMo(id){$(id).classList.remove('on');document.body.style.overflow='';}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+    if(user){
+        $('authScreen').style.display='none';
+        $('app').style.display='block';
+        $('sbEmail').textContent=user.email;
+        $('sbAv').textContent=user.email[0].toUpperCase();
+        boot();
+    } else {
+        $('authScreen').style.display='flex';
+        $('app').style.display='none';
+        if(_unsubOrders){_unsubOrders();_unsubOrders=null;}
+    }
+});
+
+$('aBtn').onclick = async () => {
+    const email=v('aEmail'), pass=v('aPass');
+    $('aErr').textContent='';
+    if(!email||!pass){$('aErr').textContent='Enter email and password';return;}
+    $('aBtn').disabled=true; $('aBtn').textContent='Signing in…';
+    try{await signInWithEmailAndPassword(auth,email,pass);}
+    catch(e){$('aErr').textContent=e.code==='auth/invalid-credential'?'Wrong email or password':e.message;}
+    finally{$('aBtn').disabled=false;$('aBtn').textContent='Sign In to Admin';}
+};
+$('aEmail').onkeydown = e=>{if(e.key==='Enter')$('aPass').focus();};
+$('aPass').onkeydown  = e=>{if(e.key==='Enter')$('aBtn').click();};
+$('soBtn').onclick    = ()=>signOut(auth);
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+function boot(){
+    setupNav(); setupMobile(); setupModals();
+    startOrdersLive();
+    loadProducts(); loadCoupons(); loadCustomers(); loadHomepage();
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function setupNav(){
+    document.querySelectorAll('.si[data-pg]').forEach(btn=>{
+        btn.onclick=()=>{
+            document.querySelectorAll('.si').forEach(b=>b.classList.remove('on'));
+            document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+            btn.classList.add('on');
+            $('pg-'+btn.dataset.pg).classList.add('on');
+            closeSb();
+        };
+    });
+}
+
+function setupMobile(){
+    $('hamBtn').onclick=()=>{$('sb').classList.toggle('open');$('ov').classList.toggle('on');};
+    $('ov').onclick=closeSb;
+}
+function closeSb(){$('sb').classList.remove('open');$('ov').classList.remove('on');}
+
+function setupModals(){
+    ['oMo','pMo','cMo'].forEach(id=>{
+        $(id.slice(0,1)+'Close').onclick=()=>closeMo(id);
+        $(id).onclick=e=>{if(e.target===$(id))closeMo(id);};
+    });
+    $('cm-type').onchange=()=>{$('cm-vg').style.display=v('cm-type')==='ship'?'none':'block';};
+}
+
+// ── ORDERS LIVE ───────────────────────────────────────────────────────────────
+function startOrdersLive(){
+    if(_unsubOrders){_unsubOrders();_unsubOrders=null;}
+    _unsubOrders = onValue(ref(db,'orders'), snap=>{
+        orders=[];
+        if(snap.exists()){
+            snap.forEach(u=>{
+                // Check karega ki format sahi hai ya nahi
+                if(u.hasChildren()){ 
+                    u.forEach(o=>{
+                        if(o.val() && typeof o.val() === 'object'){
+                            orders.push({id:o.key,uid:u.key,...o.val()});
+                        }
+                    });
+                }
+            });
+        }
+        // Naye orders sabse upar dikhane ke liye sort
+        orders.sort((a,b)=> (b.timestamp||0) - (a.timestamp||0));
+        updateStats();
+        renderOrdTable('dash-wrap', orders.slice(0,8));
+        renderOrdTable('ord-wrap', orders);
+        updatePendBadge();
+    }, error => {
+        // Agar Firebase rules block karenge toh seedha screen par error aayega
+        console.error("Firebase Error: ", error);
+        toast("Database Access Blocked! Check Firebase Rules", "err");
+        $('dash-wrap').innerHTML = '<div class="empty"><h3 style="color:#e87060;">Access Denied</h3><p>Go to Firebase and update Database Rules.</p></div>';
+        $('ord-wrap').innerHTML = '<div class="empty"><h3 style="color:#e87060;">Access Denied</h3><p>Go to Firebase and update Database Rules.</p></div>';
+    });
+}
+
+function updatePendBadge(){
+    const n=orders.filter(o=>o.status==='Pending').length;
+    $('pendBadge').textContent=n; $('pendBadge').style.display=n?'inline-block':'none';
+}
+
+function updateStats(){
+    $('s-ord').textContent=orders.length;
+    $('s-rev').textContent=inr(orders.filter(o=>o.status!=='Cancelled').reduce((s,o)=>s+parseFloat(o.totalAmount||0),0));
+    $('s-pend').textContent=orders.filter(o=>o.status==='Pending').length;
+    $('s-cust').textContent=customers.length;
+}
+
+function renderOrdTable(wid, list){
+    const f=v('sf');
+    const rows=f?list.filter(o=>o.status===f):list;
+    if(!rows.length){$(wid).innerHTML='<div class="empty"><h3>No orders yet</h3><p>Orders appear here live</p></div>';return;}
+    $(wid).innerHTML=`<table>
+    <thead><tr><th>ID</th><th>Date & Time</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows.map(o=>`<tr>
+        <td><b>#${o.id.slice(-6).toUpperCase()}</b></td>
+        <td style="font-size:12px">${new Date(o.timestamp).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
+        <td>${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</td>
+        <td><b>${inr(o.totalAmount||0)}</b></td>
+        <td><span class="badge ${sc(o.status)}">${o.status||'Pending'}</span></td>
+        <td><button class="btn bs" onclick="vwOrd('${o.id}','${o.uid}')">View</button></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+$('sf').onchange=()=>renderOrdTable('ord-wrap',orders);
+
+// admin.html me is function ko replace karein:
+window.vwOrd=function(oid,uid){
+    const o=orders.find(x=>x.id===oid); if(!o) return;
+    $('oTitle').textContent='Order #'+o.id.slice(-6).toUpperCase();
+    
+    // Database se Delivery Details nikalna
+    const dName = o.deliveryDetails?.name || 'N/A';
+    const dPhone = o.deliveryDetails?.phone || 'N/A';
+    const dAddr = o.deliveryDetails?.address || 'N/A';
+
+    $('oBody').innerHTML=`
+        <div class="o-grid">
+            <div class="o-cell"><label>Date</label><span>${new Date(o.timestamp).toLocaleString('en-IN')}</span></div>
+            <div class="o-cell"><label>Coupon</label><span>${o.coupon||'None'}</span></div>
+            <div class="o-cell"><label>Shipping</label><span>${o.shipping===0?'Free':inr(o.shipping||99)}</span></div>
+            <div class="o-cell"><label>Discount</label><span>${o.discount>0?inr(o.discount):'—'}</span></div>
+        </div>
+        
+        <div class="o-items-box" style="background:var(--pg); border:1px solid var(--br);">
+            <div style="font-size:10px;font-weight:700;color:var(--pr);text-transform:uppercase;margin-bottom:8px;">Delivery Details</div>
+            <div style="font-size:14px;font-weight:800;color:var(--tx);">${dName}</div>
+            <div style="font-size:13px;color:var(--tx2);margin-top:4px;">📞 ${dPhone}</div>
+            <div style="font-size:13px;color:var(--tx2);margin-top:4px;">📍 ${dAddr}</div>
+        </div>
+
+        <div class="o-items-box">
+            <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:10px;">Items Ordered</div>
+            ${(o.items||[]).map(i=>`<div class="o-row"><span>${i.name} × ${i.qty||1}</span><span>${inr(parseFloat(i.price)*(i.qty||1))}</span></div>`).join('')}
+            <div class="o-total"><span>Total</span><span>${inr(o.totalAmount||0)}</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <select class="status-sel" id="oSel">
+                ${['Pending','Processing','Shipped','Delivered','Cancelled'].map(s=>`<option${s===o.status?' selected':''}>${s}</option>`).join('')}
+            </select>
+            <button class="btn bp" style="flex-shrink:0" onclick="updStatus('${oid}','${uid}')">Update Status</button>
+        </div>`;
+    openMo('oMo');
+};
+
+window.updStatus=async function(oid,uid){
+    const s=v('oSel');
+    try{await update(ref(db,`orders/${uid}/${oid}`),{status:s});toast('Status → '+s,'ok');closeMo('oMo');}
+    catch(e){toast('Failed: '+e.message,'err');}
+};
+
+// ── PRODUCTS ──────────────────────────────────────────────────────────────────
+async function loadProducts(){
+    try{
+        const snap=await get(ref(db,'products'));
+        products=snap.exists()?Object.keys(snap.val()).map(k=>({id:k,...snap.val()[k]})):[];
+        renderProds();
+    }catch(e){$('prod-wrap').innerHTML='<div class="empty"><h3>Failed to load</h3></div>';}
+}
+
+function renderProds(){
+    if(!products.length){$('prod-wrap').innerHTML='<div class="empty"><h3>No products yet</h3><p>Click "Add Product" to get started</p></div>';return;}
+    $('prod-wrap').innerHTML=`<table>
+    <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Original</th><th>Rating</th><th></th></tr></thead>
+    <tbody>${products.map(p=>`<tr>
+        <td><div style="display:flex;align-items:center;gap:10px;">
+            <img src="${p.img||''}" class="p-thumb" onerror="this.style.display='none'" alt="">
+            <div><b>${p.name}</b>${p.superSpecial?' ⭐':''}<div style="font-size:11px;color:var(--tx3)">${p.id}</div></div>
+        </div></td>
+        <td><span class="badge b-processing" style="background:none;border:1px solid var(--br)">${p.category||'—'}</span></td>
+        <td><b>${inr(p.price||0)}</b></td>
+        <td>${p.originalPrice?inr(p.originalPrice):'—'}</td>
+        <td>${p.rating||'—'}</td>
+        <td><button class="btn bs" onclick="editP('${p.id}')">Edit</button></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+$('addPBtn').onclick=()=>openPMo(null);
+window.editP=id=>openPMo(id);
+
+function openPMo(id){
+    editPId=id;
+    const p=id?products.find(x=>x.id===id):null;
+    $('pTitle').textContent=p?'Edit Product':'Add Product';
+    $('pm-name').value=p?.name||''; $('pm-cat').value=p?.category||'Health';
+    $('pm-price').value=p?.price||''; $('pm-orig').value=p?.originalPrice||'';
+    $('pm-rat').value=p?.rating||''; $('pm-rev').value=p?.reviews||'';
+    $('pm-img').value=p?.img||'';
+    $('pm-imgs').value=(p?.images||[]).join('\n');
+    $('pm-desc').value=p?.desc||'';
+    $('pm-hl').value=(p?.highlights||[]).join('\n');
+    $('pm-sp').checked=p?.superSpecial||false;
+    $('pmDel').style.display=p?'block':'none';
+    openMo('pMo');
+}
+
+$('pmSave').onclick=async()=>{
+    const name=v('pm-name').trim(), price=parseFloat(v('pm-price')), img=v('pm-img').trim();
+    if(!name||!price||!img){toast('Name, price and image required','err');return;}
+    const d={name,price,category:v('pm-cat'),originalPrice:parseFloat(v('pm-orig'))||null,
+        rating:parseFloat(v('pm-rat'))||null,reviews:parseInt(v('pm-rev'))||0,img,
+        images:v('pm-imgs').split('\n').map(s=>s.trim()).filter(Boolean),
+        desc:v('pm-desc').trim(),highlights:v('pm-hl').split('\n').map(s=>s.trim()).filter(Boolean),
+        superSpecial:$('pm-sp').checked};
+    const id=editPId||('p_'+Date.now());
+    try{await set(ref(db,'products/'+id),{...d,id});toast(editPId?'Updated!':'Added!','ok');closeMo('pMo');loadProducts();}
+    catch(e){toast('Failed: '+e.message,'err');}
+};
+
+$('pmDel').onclick=async()=>{
+    if(!editPId||!confirm('Delete this product?'))return;
+    try{await remove(ref(db,'products/'+editPId));toast('Deleted','ok');closeMo('pMo');loadProducts();}
+    catch(e){toast('Failed','err');}
+};
+
+// ── HOMEPAGE ──────────────────────────────────────────────────────────────────
+async function loadHomepage(){
+    try{
+        const snap=await get(ref(db,'siteSettings'));
+        if(!snap.exists())return;
+        const s=snap.val();
+        if(s.hero){$('h-ey').value=s.hero.eyebrow||'';$('h-sub').value=s.hero.subtitle||'';$('h-tit').value=s.hero.title||'';$('h-bg').value=s.hero.bgText||'';$('h-desc').value=s.hero.desc||'';$('h-img').value=s.hero.imgUrl||'';syncH();}
+        if(s.banner1){$('b1-lt').value=s.banner1.leftTitle||'';$('b1-dis').value=s.banner1.discount||'';$('b1-rt').value=s.banner1.rightTitle||'';$('b1-d').value=s.banner1.desc||'';$('b1-img').value=s.banner1.imgUrl||'';syncB(1);}
+        if(s.banner2){$('b2-lt').value=s.banner2.leftTitle||'';$('b2-dis').value=s.banner2.discount||'';$('b2-rt').value=s.banner2.rightTitle||'';$('b2-d').value=s.banner2.desc||'';$('b2-img').value=s.banner2.imgUrl||'';syncB(2);}
+        if(s.section){$('sec-t').value=s.section.title||'';$('sec-s').value=s.section.subtitle||'';}
+    }catch(e){}
+}
+
+function syncH(){
+    $('pEy').textContent=v('h-ey');$('pSub').textContent=v('h-sub');$('pTit').textContent=v('h-tit');
+    const u=v('h-img'); if(u){$('pImg').src=u;$('pImg').style.display='block';}else $('pImg').style.display='none';
+}
+function syncB(n){
+    $('bp'+n+'T').textContent=v('b'+n+'-lt');
+    $('bp'+n+'D').textContent=[v('b'+n+'-dis'),v('b'+n+'-rt')].filter(Boolean).join(' · ');
+    const u=v('b'+n+'-img'); if(u){$('bp'+n+'I').src=u;$('bp'+n+'I').style.display='block';}else $('bp'+n+'I').style.display='none';
+}
+
+['h-ey','h-sub','h-tit','h-img'].forEach(id=>$(id).addEventListener('input',syncH));
+[1,2].forEach(n=>['lt','dis','rt','img'].forEach(k=>$(`b${n}-${k}`).addEventListener('input',()=>syncB(n))));
+
+$('saveHero').onclick=async()=>{
+    const hero={eyebrow:v('h-ey'),subtitle:v('h-sub'),title:v('h-tit'),bgText:v('h-bg'),desc:v('h-desc'),imgUrl:v('h-img')};
+    try{await update(ref(db,'siteSettings'),{hero});toast('Hero saved! Reload site to apply','ok');}
+    catch(e){toast('Failed','err');}
+};
+$('saveBan').onclick=async()=>{
+    const b1={leftTitle:v('b1-lt'),discount:v('b1-dis'),rightTitle:v('b1-rt'),desc:v('b1-d'),imgUrl:v('b1-img')};
+    const b2={leftTitle:v('b2-lt'),discount:v('b2-dis'),rightTitle:v('b2-rt'),desc:v('b2-d'),imgUrl:v('b2-img')};
+    try{await update(ref(db,'siteSettings'),{banner1:b1,banner2:b2});toast('Banners saved!','ok');}
+    catch(e){toast('Failed','err');}
+};
+$('saveSec').onclick=async()=>{
+    const section={title:v('sec-t'),subtitle:v('sec-s')};
+    try{await update(ref(db,'siteSettings'),{section});toast('Section labels saved!','ok');}
+    catch(e){toast('Failed','err');}
+};
+
+// ── COUPONS ───────────────────────────────────────────────────────────────────
+async function loadCoupons(){
+    try{
+        const snap=await get(ref(db,'coupons'));
+        coupons=snap.exists()?snap.val():{};
+        if(!Object.keys(coupons).length){
+            coupons={VEHDIC10:{type:'percent',value:10,label:'10% off'},WELCOME20:{type:'percent',value:20,label:'20% off'},FLAT100:{type:'fixed',value:100,label:'₹100 off'},SAVE200:{type:'fixed',value:200,label:'₹200 off'},FREESHIP:{type:'ship',value:0,label:'Free shipping'}};
+            await set(ref(db,'coupons'),coupons);
+        }
+        renderCoupons();
+    }catch(e){}
+}
+
+function renderCoupons(){
+    const entries=Object.entries(coupons);
+    if(!entries.length){$('coup-wrap').innerHTML='<div class="empty"><h3>No coupons</h3></div>';return;}
+    $('coup-wrap').innerHTML=`<table>
+    <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Label</th><th></th></tr></thead>
+    <tbody>${entries.map(([code,c])=>`<tr>
+        <td><b style="letter-spacing:.5px">${code}</b></td>
+        <td>${c.type}</td>
+        <td>${c.type==='ship'?'Free':c.type==='percent'?c.value+'%':inr(c.value)}</td>
+        <td>${c.label}</td>
+        <td><button class="btn bs" onclick="editC('${code}')">Edit</button></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+$('addCBtn').onclick=()=>openCMo(null);
+window.editC=code=>openCMo(code);
+
+function openCMo(code){
+    editCCode=code;
+    const c=code?coupons[code]:null;
+    $('cTitle').textContent=c?'Edit Coupon':'Add Coupon';
+    $('cm-code').value=code||''; $('cm-code').readOnly=!!code;
+    $('cm-type').value=c?.type||'percent';
+    $('cm-val').value=c?.value||''; $('cm-lbl').value=c?.label||'';
+    $('cm-vg').style.display=(c?.type||'percent')==='ship'?'none':'block';
+    $('cmDel').style.display=c?'block':'none';
+    openMo('cMo');
+}
+
+$('cmSave').onclick=async()=>{
+    const code=v('cm-code').trim().toUpperCase(),type=v('cm-type'),value=parseFloat(v('cm-val'))||0,label=v('cm-lbl').trim();
+    if(!code||!label){toast('Code and label required','err');return;}
+    try{await set(ref(db,'coupons/'+code),{type,value,label});toast('Saved!','ok');closeMo('cMo');loadCoupons();}
+    catch(e){toast('Failed','err');}
+};
+
+$('cmDel').onclick=async()=>{
+    if(!editCCode||!confirm('Delete '+editCCode+'?'))return;
+    try{await remove(ref(db,'coupons/'+editCCode));toast('Deleted','ok');closeMo('cMo');loadCoupons();}
+    catch(e){toast('Failed','err');}
+};
+
+// ── CUSTOMERS ─────────────────────────────────────────────────────────────────
+// ── CUSTOMERS ─────────────────────────────────────────────────────────────────
+async function loadCustomers(){
+    try {
+        const snap = await get(ref(db,'users'));
+        let dbUsers = {};
+        
+        // 1. Pehle database se users nikalenge (agar save hue hain toh)
+        if(snap.exists()) {
+            snap.forEach(u => {
+                const data = u.val();
+                // Data chahe 'profile' object me ho ya direct ho, ye dono handle kar lega
+                const userData = data.profile || data; 
+                dbUsers[u.key] = { uid: u.key, ...userData };
+            });
+        }
+
+        // 2. SMART FALLBACK: Agar kisi ne order place kiya hai, toh uski details 
+        // automatically Orders me se extract kar ke Customer list me add kar lenge
+        orders.forEach(o => {
+            if (!dbUsers[o.uid] && o.deliveryDetails) {
+                dbUsers[o.uid] = {
+                    uid: o.uid,
+                    name: o.deliveryDetails.name || 'Unknown',
+                    phone: o.deliveryDetails.phone || '—',
+                    address: o.deliveryDetails.address || '—',
+                    email: 'Saved from Order',
+                    createdAt: o.timestamp
+                };
+            }
+        });
+
+        // Object ko array me convert karna
+        customers = Object.values(dbUsers);
+        
+        // Naye customers ko sabse upar dikhane ke liye sort karna
+        customers.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+        
+        updateStats();
+        renderCustomers();
+        
+    } catch(e) {
+        console.error("Customer Load Error:", e);
+        $('cust-wrap').innerHTML='<div class="empty"><h3 style="color:#e87060;">Error Loading Customers</h3><p>'+e.message+'</p></div>';
+    }
+}
+
+function renderCustomers(){
+    if(!customers.length){
+        $('cust-wrap').innerHTML='<div class="empty"><h3>No customers yet</h3><p>Users will appear here when they register or order.</p></div>';
+        return;
+    }
+    
+    $('cust-wrap').innerHTML=`<table>
+    <thead><tr><th>Name</th><th>Email / Info</th><th>Phone</th><th>Address</th><th>Date</th></tr></thead>
+    <tbody>${customers.map(c=>`<tr>
+        <td><b>${c.name||'—'}</b></td>
+        <td>${c.email||'—'}</td>
+        <td>${c.phone||'—'}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.address||''}">${c.address||'—'}</td>
+        <td style="font-size:12px">${c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-IN') : '—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+</script>
+</body>
+</html>
