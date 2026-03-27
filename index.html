@@ -610,9 +610,23 @@ function toast(msg,type=''){
 function openMo(id){$(id).classList.add('on');document.body.style.overflow='hidden';}
 function closeMo(id){$(id).classList.remove('on');document.body.style.overflow='';}
 
+// ── ADMIN CONFIG — apna Firebase UID yahan daalo ─────────────────────────────
+// Firebase Console → Authentication → Users → apna email dhundo → UID copy karo
+const ADMIN_UIDS = [
+    'nHnExVXqzTdzT0gL710LAH0JnRQ2'   // ← yahan apna UID daalo
+];
+// Agar ADMIN_UIDS empty hai toh restriction off hai (setup ke liye)
+// Production me ZAROOR UID daalna
+
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, user => {
     if(user){
+        // UID check — agar list bhari hai toh sirf allowed UIDs ko access milega
+        if(ADMIN_UIDS.length > 0 && !ADMIN_UIDS.includes(user.uid)){
+            $('aErr').textContent = 'Access denied. Authorised admin only.';
+            signOut(auth);
+            return;
+        }
         $('authScreen').style.display='none';
         $('app').style.display='block';
         $('sbEmail').textContent=user.email;
